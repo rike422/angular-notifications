@@ -3,7 +3,7 @@
 angular.module('notifications', []).
   factory('$notification', ['$timeout',function($timeout){
 
-    console.log('notification service online');
+//    console.log('notification service online');
     var notifications = JSON.parse(localStorage.getItem('$notifications')) || [],
         queue = [];
 
@@ -75,7 +75,7 @@ angular.module('notifications', []).
 
       requestHtml5ModePermissions: function(){
         if (window.webkitNotifications){
-          console.log('notifications are available');
+//          console.log('notifications are available');
           if (window.webkitNotifications.checkPermission() === 0) {
             return true;
           }
@@ -97,6 +97,11 @@ angular.module('notifications', []).
         }
       },
 
+      setSetting: function (key, value) {
+        settings[key] = value;
+        return settings;
+      },
+
 
       /* ============ QUERYING RELATED METHODS ============*/
 
@@ -112,7 +117,6 @@ angular.module('notifications', []).
       /* ============== NOTIFICATION METHODS ==============*/
 
       info: function(title, content, userData, duration){
-        console.log(title, content);
         return this.awesomeNotify('info','info', title, content, userData, duration);
       },
 
@@ -142,13 +146,13 @@ angular.module('notifications', []).
         return this.makeNotification(type, false, icon, title, content, userData, duration);
       },
 
-      notify: function(image, title, content, userData, duration){
+      notify: function(image, title, content, userData, duration, notificationClass){
         // Wraps the makeNotification method for displaying notifications with images
         // rather than icons
-        return this.makeNotification('custom', image, true, title, content, userData);
+        return this.makeNotification('custom', image, true, title, content, userData, notificationClass);
       },
 
-      makeNotification: function(type, image, icon, title, content, userData, duration){
+      makeNotification: function(type, image, icon, title, content, userData, duration, notificationClass){
         var notification = {
           'type': type,
           'image': image,
@@ -157,7 +161,8 @@ angular.module('notifications', []).
           'content': content,
           'timestamp': +new Date(),
           'userData': userData,
-	  'duration': duration
+	      'duration': duration,
+          'notificationClass': notificationClass
         };
         notifications.push(notification);
 	if(duration == undefined) {
@@ -165,9 +170,9 @@ angular.module('notifications', []).
 	}
         if(settings.html5Mode){
           html5Notify(image, title, content, function(){
-            console.log("inner on display function");
+//            console.log("inner on display function");
           }, function(){
-            console.log("inner on close function");
+//            console.log("inner on close function");
           });
         }
         else{
@@ -216,9 +221,8 @@ angular.module('notifications', []).
      * Finally, the directive should have its own controller for
      * handling all of the notifications from the notification service
      */
-    console.log('this is a new directive');
     var html =
-      '<div class="dr-notification-wrapper" ng-repeat="noti in queue">' +
+      '<div class="dr-notification-wrapper {{ noti.notificationClass }}" ng-repeat="noti in queue">' +
         '<div class="dr-notification-close-btn" ng-click="removeNotification(noti)">' +
           '<i class="icon-remove"></i>' +
         '</div>' +
